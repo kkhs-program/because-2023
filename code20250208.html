@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Display</title>
+    <style>
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: Consolas, "Courier New", monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pythonコードの表示</h1>
+    <pre><code>
+# 画面サイズ
+WIDTH = 600
+HEIGHT = 400
+
+# プレイヤー設定
+player = Actor("player")
+player.pos = (WIDTH // 2, HEIGHT - 50))
+
+# 弾リスト
+bullets = []
+
+def update():
+    """ゲームの更新処理"""
+    global bullets
+    # 左右移動
+    if keyboard.left and player.x > 0:
+        player.x -= 5
+    if keyboard.right and player.x < WIDTH:
+        player.x += 5
+
+    # 弾の移動
+    for bullet in bullets:
+        bullet.y -= 5  # 弾を上に移動
+
+    # 画面外に出た弾を削除
+    new_bullets = []
+    for bullet in bullets:
+        if bullet.y > 0:
+            new_bullets.append(bullet)
+    bullets = new_bullets
+
+
+def draw():
+    """画面描画"""
+    screen.clear()
+    player.draw()
+    for bullet in bullets:
+        bullet.draw()
+
+def on_key_down(key):
+    """キーが押された時の処理"""
+    if key == keys.SPACE:
+        bullet = Actor("bullet", (player.x, player.y - 40))  # 弾の初期位置
+        bullets.append(bullet)  # 弾リストに追加
+
+    </code></pre>
+</body>
+</html>
