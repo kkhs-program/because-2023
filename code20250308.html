@@ -38,6 +38,7 @@
             "button", pos=(WIDTH // 2, HEIGHT // 2 + 50), anchor=("center", "center")
         )
         
+        score = 0
         
         def update():
             if is_game_over:
@@ -84,7 +85,7 @@
         
         
         def check_collisions():
-            global enemies, bullets
+            global enemies, bullets, score
             new_bullets = []
             new_enemies = []
             for enemy in enemies:
@@ -92,6 +93,7 @@
                 for bullet in bullets:
                     if bullet.colliderect(enemy):
                         hit = True
+                        score += 1
                         break
                 if not hit:
                     new_enemies.append(enemy)
@@ -110,6 +112,7 @@
             else:
                 screen.clear()
                 player.draw()
+                screen.draw.text("Score:{}".format(score), (20, 10), fontsize=30, color="blue")
                 for bullet in bullets:
                     bullet.draw()
                 for enemy in enemies:
@@ -158,14 +161,14 @@
         
         
         def restart_game():
-            """ゲームをリセットして再スタート"""
             global is_game_over, bullets, enemies, enemy_timer
             is_game_over = False
             bullets = []
             enemies = []
             enemy_timer = 0
+            score = 0
             player.pos = (WIDTH // 2, HEIGHT - 50)
-                
+                        
     </code></pre>
 </body>
 </html>
