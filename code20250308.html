@@ -19,156 +19,156 @@
 <body>
     <h1>Pythonコードの表示</h1>
     <pre><code>
-        import random
+import random
 
-        WIDTH = 600
-        HEIGHT = 400
-        
-        player = Actor("player", (WIDTH // 2, HEIGHT - 50))
-        
-        bullets = []
-        
-        enemies = []
-        
-        ENEMY_SPAWN_TIME = 60
+WIDTH = 600
+HEIGHT = 400
+
+player = Actor("player", (WIDTH // 2, HEIGHT - 50))
+
+bullets = []
+
+enemies = []
+
+ENEMY_SPAWN_TIME = 60
+enemy_timer = 0
+
+is_game_over = False
+restart_button = Actor(
+    "button", pos=(WIDTH // 2, HEIGHT // 2 + 50), anchor=("center", "center")
+)
+
+score = 0
+
+def update():
+    if is_game_over:
+        return
+
+    global bullets
+    if keyboard.left and player.x > 40:
+        player.x -= 5
+    if keyboard.right and player.x < WIDTH - 40:
+        player.x += 5
+
+    for bullet in bullets:
+        bullet.y -= 5  # 弾を上に移動
+
+    new_bullets = []
+    for bullet in bullets:
+        if bullet.y > 0:
+            new_bullets.append(bullet)
+    bullets = new_bullets
+
+    for enemy in enemies:
+        enemy.y += 1
+
+    global enemy_timer
+    enemy_timer += 1
+    if enemy_timer >= ENEMY_SPAWN_TIME:
+        spawn_enemy()
         enemy_timer = 0
-        
-        is_game_over = False
-        restart_button = Actor(
-            "button", pos=(WIDTH // 2, HEIGHT // 2 + 50), anchor=("center", "center")
-        )
-        
-        score = 0
-        
-        def update():
-            if is_game_over:
-                return
-        
-            global bullets
-            if keyboard.left and player.x > 40:
-                player.x -= 5
-            if keyboard.right and player.x < WIDTH - 40:
-                player.x += 5
-        
-            for bullet in bullets:
-                bullet.y -= 5  # 弾を上に移動
-        
-            new_bullets = []
-            for bullet in bullets:
-                if bullet.y > 0:
-                    new_bullets.append(bullet)
-            bullets = new_bullets
-        
-            for enemy in enemies:
-                enemy.y += 1
-        
-            global enemy_timer
-            enemy_timer += 1
-            if enemy_timer >= ENEMY_SPAWN_TIME:
-                spawn_enemy()
-                enemy_timer = 0
-        
-            check_collisions()
-        
-            check_game_over()
-        
-        
-        def check_game_over():
-            global enemies
-            for enemy in enemies:
-                if player.colliderect(enemy):
-                    gameover()
-                    break
-                if enemy.y >= HEIGHT:
-                    gameover()
-                    break
-        
-        
-        def check_collisions():
-            global enemies, bullets, score
-            new_bullets = []
-            new_enemies = []
-            for enemy in enemies:
-                hit = False
-                for bullet in bullets:
-                    if bullet.colliderect(enemy):
-                        hit = True
-                        score += 1
-                        break
-                if not hit:
-                    new_enemies.append(enemy)
-        
-            for bullet in bullets:
-                if not any(bullet.colliderect(enemy) for enemy in enemies):
-                    new_bullets.append(bullet)
-        
-            bullets = new_bullets
-            enemies = new_enemies
-        
-        
-        def draw():
-            if is_game_over:
-                draw_game_over_screen()
-            else:
-                screen.clear()
-                player.draw()
-                screen.draw.text("Score:{}".format(score), (20, 10), fontsize=30, color="blue")
-                for bullet in bullets:
-                    bullet.draw()
-                for enemy in enemies:
-                    enemy.draw()
-        
-        
-        def on_key_down(key):
-            if key == keys.SPACE:
-                shoot()
-        
-        
-        def on_mouse_down(pos):
-            if restart_button.collidepoint(pos):
-                restart_game()
-        
-        
-        def shoot():
-            bullet = Actor("bullet", (player.x, player.y - 40))  # 弾の初期位置
-            bullets.append(bullet)  # 弾リストに追加
-        
-        
-        def spawn_enemy():
-            enemy_x = random.randint(40, WIDTH - 40)
-            enemy_type = random.randint(1, 5)
-            enemy = Actor("enemy{}".format(enemy_type), anchor=("center", "bottom"))
-            enemy.pos = enemy_x, 40
-            enemies.append(enemy)
-        
-        
-        def gameover():
-            global is_game_over
-            is_game_over = True
-            print("Game Over!!")
-        
-        
-        def draw_game_over_screen():
-            screen.clear()
-            screen.fill("white")
-            restart_button.draw()
-            screen.draw.text(
-                "Game Over", center=(WIDTH // 2, HEIGHT // 2 - 50), fontsize=60, color="red"
-            )
-            screen.draw.text(
-                "Restart!", center=(WIDTH // 2, HEIGHT // 2 + 50), fontsize=40, color="white"
-            )
-        
-        
-        def restart_game():
-            global is_game_over, bullets, enemies, enemy_timer
-            is_game_over = False
-            bullets = []
-            enemies = []
-            enemy_timer = 0
-            score = 0
-            player.pos = (WIDTH // 2, HEIGHT - 50)
-                        
+
+    check_collisions()
+
+    check_game_over()
+
+
+def check_game_over():
+    global enemies
+    for enemy in enemies:
+        if player.colliderect(enemy):
+            gameover()
+            break
+        if enemy.y >= HEIGHT:
+            gameover()
+            break
+
+
+def check_collisions():
+    global enemies, bullets, score
+    new_bullets = []
+    new_enemies = []
+    for enemy in enemies:
+        hit = False
+        for bullet in bullets:
+            if bullet.colliderect(enemy):
+                hit = True
+                score += 1
+                break
+        if not hit:
+            new_enemies.append(enemy)
+
+    for bullet in bullets:
+        if not any(bullet.colliderect(enemy) for enemy in enemies):
+            new_bullets.append(bullet)
+
+    bullets = new_bullets
+    enemies = new_enemies
+
+
+def draw():
+    if is_game_over:
+        draw_game_over_screen()
+    else:
+        screen.clear()
+        player.draw()
+        screen.draw.text("Score:{}".format(score), (20, 10), fontsize=30, color="blue")
+        for bullet in bullets:
+            bullet.draw()
+        for enemy in enemies:
+            enemy.draw()
+
+
+def on_key_down(key):
+    if key == keys.SPACE:
+        shoot()
+
+
+def on_mouse_down(pos):
+    if restart_button.collidepoint(pos):
+        restart_game()
+
+
+def shoot():
+    bullet = Actor("bullet", (player.x, player.y - 40))  # 弾の初期位置
+    bullets.append(bullet)  # 弾リストに追加
+
+
+def spawn_enemy():
+    enemy_x = random.randint(40, WIDTH - 40)
+    enemy_type = random.randint(1, 5)
+    enemy = Actor("enemy{}".format(enemy_type), anchor=("center", "bottom"))
+    enemy.pos = enemy_x, 40
+    enemies.append(enemy)
+
+
+def gameover():
+    global is_game_over
+    is_game_over = True
+    print("Game Over!!")
+
+
+def draw_game_over_screen():
+    screen.clear()
+    screen.fill("white")
+    restart_button.draw()
+    screen.draw.text(
+        "Game Over", center=(WIDTH // 2, HEIGHT // 2 - 50), fontsize=60, color="red"
+    )
+    screen.draw.text(
+        "Restart!", center=(WIDTH // 2, HEIGHT // 2 + 50), fontsize=40, color="white"
+    )
+
+
+def restart_game():
+    global is_game_over, bullets, enemies, enemy_timer
+    is_game_over = False
+    bullets = []
+    enemies = []
+    enemy_timer = 0
+    score = 0
+    player.pos = (WIDTH // 2, HEIGHT - 50)
+                
     </code></pre>
 </body>
 </html>
